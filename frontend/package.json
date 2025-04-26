@@ -1,0 +1,31 @@
+{
+    "name": "codebuddy-ai",
+    "version": "1.0.0",
+    "private": true,
+    "scripts": {
+        "dev": "next dev",
+        "build": "next build",
+        "start": "next start",
+        "lint": "next lint"
+    },
+    "dependencies": {
+        "axios": "^1.6.2",
+        "next": "^14.0.3",
+        "nprogress": "^0.2.0",
+        "prismjs": "^1.29.0",
+        "react": "^18.2.0",
+        "react-dom": "^18.2.0"
+    },
+    "devDependencies": {
+        "autoprefixer": "^10.4.21",
+        "css-loader": "^7.1.2",
+        "eslint": "^8.54.0",
+        "eslint-config-next": "^14.0.3",
+        "postcss": "^8.5.3",
+        "postcss-flexbugs-fixes": "^5.0.2",
+        "postcss-loader": "^8.1.1",
+        "postcss-preset-env": "^10.1.6",
+        "style-loader": "^4.0.0",
+        "tailwindcss": "^3.4.17"
+    }
+}
