@@ -17,3 +17,5 @@
 /frontend/node_modules/webpack
 /frontend/node_modules/yaml
 /frontend/node_modules
+/Original Code/__pycache__
+dump_snapshot.pickle
