@@ -1,0 +1,26 @@
+# Core Python Libraries
+torch>=2.0.0
+transformers>=4.35.0
+gradio>=4.0.0
+psutil>=5.9.0
+numpy>=1.22.0
+Pillow>=9.4.0
+datasets>=2.15.0
+
+# Code Analysis and Processing
+cpuinfo>=9.0.0
+
+# Optional: For GPU Support
+bitsandbytes>=0.40.0
+accelerate>=0.24.0
+flash-attn>=2.0.0,<3.0.0  # Optional but recommended for RTX 40 series
+
+# Development and Debugging
+matplotlib>=3.7.0
+scipy>=1.10.0
+
+# Note for users:
+# - Install torch with CUDA support for GPU acceleration:
+#   pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+# - Ensure you have a CUDA-capable GPU and CUDA toolkit installed
+# - A Hugging Face account is required to access CodeLlama models
