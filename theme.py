@@ -50,3 +50,34 @@ def create_theme():
         print(f"Could not create custom theme. Error: {e}")
         print("Falling back to default Gradio theme.")
         return None
+    
+def get_logo_with_dimensions(logo_path, max_height=50):
+    """
+    Returns the logo path with proper dimension constraints
+    to prevent stretching in the UI
+    """
+    if not os.path.exists(logo_path):
+        print(f"Warning: Logo file not found: {logo_path}")
+        return None
+    
+    try:
+        from PIL import Image
+        # Check dimensions of the logo
+        img = Image.open(logo_path)
+        width, height = img.size
+        
+        # Calculate aspect ratio to maintain proportions
+        aspect_ratio = width / height
+        new_height = min(max_height, height)
+        new_width = int(new_height * aspect_ratio)
+        
+        print(f"Logo dimensions: Original {width}x{height}, Displayed as {new_width}x{new_height}")
+        
+        return {
+            "path": logo_path,
+            "width": new_width,
+            "height": new_height
+        }
+    except Exception as e:
+        print(f"Could not process logo image: {e}")
+        return {"path": logo_path, "width": None, "height": max_height}

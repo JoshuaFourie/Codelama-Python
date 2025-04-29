@@ -1,7 +1,0 @@
-{
-  "instruction": "test",
-  "response": "= {\n  'name': 'q1_2',\n  'points': 1,\n  'suites': [\n    {\n      'cases': [\n        {\n          'code': r\"\"\"\n          >>> len(my_list) == 50000\n          True\n          \"\"\",\n          'hidden': False,\n          'locked': False\n        },\n        {\n          'code': r\"\"\"\n          >>> sum(my_list) == 62500000.0\n          True\n          \"\"\",\n          'hidden': False,\n          'locked': False\n        }\n      ],\n      'scored': True,\n      'setup': '',\n      'teardown': '',\n      'type': 'doctest'\n    }\n  ]\n}\n",
-  "source": "Negative_Feedback",
-  "language": "Python",
-  "timestamp": "20250424_151212"
-}

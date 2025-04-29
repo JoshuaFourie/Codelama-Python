@@ -11,6 +11,7 @@ from threading import Thread
 # Import custom modules
 from model_manager import MultiModelManager
 from theme import create_theme  # Import theme configuration
+from theme import get_logo_with_dimensions
 
 # Define directories
 CACHE_DIR = "models"
@@ -20,7 +21,7 @@ CHAT_HISTORY_DIR = "chat_history"
 # Import application settings from theme
 from theme import APP_NAME, APP_TAGLINE, APP_LOGO, PRIMARY_COLOR, SECONDARY_COLOR, AVATAR_EMOJI
 
-# Add this CSS directly to your existing app.py file
+# Custom CSS for styling
 custom_css = """
 /* Modern dark theme */
 body, .gradio-container {
@@ -28,7 +29,113 @@ body, .gradio-container {
     color: #F9FAFB !important;
 }
 
-/* AI Comparison Tab Styling */
+.bot-avatar img {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: contain;
+    background-color: #3B82F6;
+}
+
+/* Side-by-side layout for chat and code */
+.chat-code-container {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.chat-column {
+    flex: 1;
+    min-width: 300px;
+    display: flex;
+    flex-direction: column;
+}
+
+.code-column {
+    flex: 1;
+    min-width: 300px;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Make sure chatbot stays in its column */
+.modern-chatbot {
+    height: 400px;
+    overflow-y: auto;
+    border-radius: 8px;
+    border: 1px solid #334155;
+}
+
+/* Code display styling */
+.code-display-container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.code-display {
+    flex-grow: 1;
+    border-radius: 8px;
+    border: 1px solid #334155;
+    background-color: #1e1e1e;
+    font-family: 'Fira Code', 'Cascadia Code', 'Courier New', monospace;
+    height: 400px;
+}
+
+/* Button layout improvements */
+.action-buttons-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 15px;
+    justify-content: space-between;
+}
+
+.action-button-group {
+    display: flex;
+    gap: 10px;
+}
+
+.action-button {
+    min-width: 100px;
+}
+
+.feedback-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+/* Enhanced language selector */
+.language-selector-container {
+    background-color: #1e293b;
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 15px;
+}
+
+.language-options {
+    display: flex;
+    gap: 10px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+    .chat-code-container {
+        flex-direction: column;
+    }
+    
+    .chat-column, .code-column {
+        width: 100%;
+    }
+    
+    .modern-chatbot, .code-display {
+        height: 300px;
+    }
+}
+
+/* AI Comparison Tab Styling and other styles remain the same */
 .ai-comparison-container {
     border-radius: 8px;
     margin-bottom: 16px;
@@ -110,25 +217,6 @@ body, .gradio-container {
     border-radius: 8px;
     margin-top: 10px;
 }
-.code-display-container {
-    margin-top: 10px;
-    margin-bottom: 15px;
-}
-
-.code-display {
-    border-radius: 8px;
-    border: 1px solid #334155;
-    background-color: #1e1e1e;
-    font-family: 'Fira Code', 'Cascadia Code', 'Courier New', monospace;
-}
-
-.code-display pre {
-    margin: 0;
-}
-
-.code-display .cm-editor {
-    background-color: #1e1e1e;
-}
 
 .section-label {
     font-weight: 600;
@@ -136,24 +224,80 @@ body, .gradio-container {
     color: #94a3b8;
 }
 
-/* Adjust chatbot to accommodate code display */
-.modern-chatbot {
-    margin-bottom: 0;
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
+/* Status display enhancement */
+.status-container {
+    background-color: #1e293b;
+    border-radius: 8px;
+    padding: 10px;
+    margin-top: 10px;
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
-    .comparison-actions {
-        flex-direction: column;
-    }
-    
-    .action-button {
-        width: 100%;
-        margin-bottom: 8px;
-    }
+.status-text {
+    font-family: monospace;
+    color: #94a3b8;
 }
+
+/* Base styles for all messages - minimal styling */
+.message {
+    margin: 8px 0 !important;
+}
+
+/* Remove bubble styling ONLY for assistant messages */
+.bot-message, .bot-bubble, .message.svelte-1gfkn6j:nth-child(even) {
+    border: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    padding: 5px 10px !important;
+}
+
+/* Keep bubble styling for user messages */
+.user-message, .user-bubble, .message.svelte-1gfkn6j:nth-child(odd) {
+    background: #2d3748 !important; /* Dark blue background */
+    border-radius: 12px !important;
+    padding: 10px 14px !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) !important;
+    border: 1px solid #4a5568 !important;
+}
+
+/* Style the message container */
+.messages-container {
+    background: #111827 !important;
+    border-radius: 8px !important;
+    padding: 16px !important;
+    border: 1px solid #1f2937 !important;
+}
+
+/* Make user messages visually distinct */
+.user-message, .user-bubble {
+    color: #e2e8f0 !important;
+    font-weight: 500 !important;
+}
+
+.bot-message, .bot-bubble {
+    color: #a0d2eb !important;
+}
+
+/* Remove borders from chatbot component */
+.modern-chatbot > div {
+    border: 1px solid #1f2937 !important;
+    background: #111827 !important;
+    border-radius: 8px;
+}
+
+/* Enhanced styling for the code display area */
+.code-display {
+    border: 1px solid #27272a !important;
+    border-radius: 8px !important;
+    background-color: #1e1e2e !important;
+    font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+}
+
+.code-display pre {
+    padding: 16px !important;
+    font-size: 14px !important;
+    line-height: 1.5 !important;
+}
+
 """
 
 # Create necessary directories
@@ -161,35 +305,39 @@ os.makedirs(CACHE_DIR, exist_ok=True)
 os.makedirs(TRAINING_DIR, exist_ok=True)
 os.makedirs(CHAT_HISTORY_DIR, exist_ok=True)
 
+### Application Initialization
+
 class MultiLanguageCodeBuddy:
     def __init__(self, hf_token=None):
-        # Define model configurations - MODIFIED TO USE CODELLAMA 13B INSTRUCT FOR BOTH LANGUAGES
-        models_config = {
+        # Define model configurations
+        self.models_config = {
             'python': {
                 'model_name': 'meta-llama/CodeLlama-13b-Instruct-hf',
                 'prompt_template': "Write Python code for the following request:\n\n{prompt}\n\nCode:"
             },
             'powershell': {
-                'model_name': 'meta-llama/CodeLlama-13b-Instruct-hf',  # Same model for PowerShell
+                'model_name': 'meta-llama/CodeLlama-13b-Instruct-hf',
                 'prompt_template': "You are an expert PowerShell programmer. Write PowerShell code for the following request:\n\n{prompt}\n\nEnsure the code follows PowerShell best practices and includes comments. Provide only the code.\n\n```powershell"
             }
         }
         
         # Initialize model manager
-        self.model_manager = MultiModelManager(models_config, cache_dir=CACHE_DIR)
+        self.model_manager = MultiModelManager(self.models_config, cache_dir=CACHE_DIR)
         
-        # Store the auth token for later use but don't load any models yet
+        # Store the auth token for later use
         self.model_manager.set_auth_token(hf_token)
         
         # Status message for model loading state
         self.status_message = ""
-    
+
+    ### Core Functions
+
     def generate_code(self, prompt, chat_history=None, language=None, temperature=0.2, max_new_tokens=1024, repetition_penalty=1.1):
         """Generate code based on prompt and chat history, lazily loading models as needed"""
         self.status_message = "Detecting language..."
         yield self.status_message
         
-        # Detect which language is being requested if not specified
+        # Detect language if not specified
         if language is None or language == "Auto Detect":
             language = self.model_manager.detect_language(prompt)
         else:
@@ -216,7 +364,9 @@ class MultiLanguageCodeBuddy:
             # Format the code with appropriate syntax highlighting
             formatted_response = self.model_manager.format_code(response, language)
             yield formatted_response
-    
+
+    ### Training Data Management
+
     def save_training_example(self, task, solution, source_name=None):
         """Save a training example to the training data directory"""
         if not task or not solution:
@@ -246,7 +396,7 @@ class MultiLanguageCodeBuddy:
             return f"Saved {language_name} example to {filepath}"
         except Exception as e:
             return f"Error saving example: {str(e)}"
-    
+
     def save_comparison_example(self, question, codebuddy_response, other_ai_response, other_ai_name, language=None):
         """Save a comparison example between CodeBuddy and another AI system"""
         if not question or not codebuddy_response or not other_ai_response:
@@ -281,7 +431,7 @@ class MultiLanguageCodeBuddy:
             return f"Saved comparison example to {filepath}"
         except Exception as e:
             return f"Error saving comparison example: {str(e)}"
-    
+
     def save_positive_feedback(self, chat_history):
         """Save positive feedback for the last response"""
         if not chat_history:
@@ -309,7 +459,7 @@ class MultiLanguageCodeBuddy:
             return "Incomplete conversation to provide feedback on."
         
         return self.save_training_example(last_user_msg['content'], last_bot_msg['content'], "Negative_Feedback")
-        
+
     def unload_current_model(self):
         """Unload currently loaded models to free memory"""
         for language in ['python', 'powershell']:
@@ -434,6 +584,7 @@ class MultiLanguageCodeBuddy:
         except Exception as e:
             return f"Error deleting example: {str(e)}", []
 
+    ### Interface Setup
     def setup_interface(self):
         """Create the modernized Gradio interface using the theme module"""
         
@@ -445,79 +596,112 @@ class MultiLanguageCodeBuddy:
             with gr.Row(variant="panel", elem_classes="header-container"):
                 with gr.Column(scale=1, min_width=100):
                     if os.path.exists(APP_LOGO):
-                        gr.Image(APP_LOGO, label="", show_label=False, height=50, container=False, elem_classes="logo-image")
+                        # Get properly sized logo
+                        logo_config = get_logo_with_dimensions(APP_LOGO)
+                        gr.Image(
+                            logo_config["path"], 
+                            label="", 
+                            show_label=False, 
+                            height=logo_config["height"],
+                            width=logo_config["width"],
+                            container=False, 
+                            elem_classes="logo-image"
+                        )
                 with gr.Column(scale=5):
                     gr.Markdown(f"<h1 class='app-title'>{APP_NAME}</h1>")
                     gr.Markdown(f"<p class='app-tagline'>{APP_TAGLINE}</p>")
             
             # Tabs with modern styling
-            with gr.Tab("Chat", elem_classes="tab-content"):
-                with gr.Column(elem_classes="chat-container"):
-                    # Language selector with improved styling
-                    with gr.Row(elem_classes="language-selector-row"):
-                        with gr.Column(scale=2, elem_classes="language-selector-container"):
-                            gr.Markdown("<p class='section-label'>Language</p>")
-                            language_selector = gr.Radio(
-                                choices=["Auto Detect", "Python", "PowerShell"],
-                                value="Auto Detect",
-                                label="",
-                                show_label=False,
-                                interactive=True,
-                                elem_classes="language-options"
-                            )
-                        with gr.Column(scale=3, elem_classes="language-indicator-container"):
-                            language_indicator = gr.Markdown(
-                                "**Current Language Mode**: Auto Detect", 
-                                elem_classes="language-indicator"
-                            )
-                    
-                    # Improved chat display
-                    chatbot = gr.Chatbot(
-                        height=400,  # Reduced height to make room for code display
-                        avatar_images=(None, AVATAR_EMOJI),
-                        show_copy_button=True,
-                        type='messages',
-                        elem_classes="modern-chatbot"
-                    )
-                    
-                    # Add a separate code display component
-                    with gr.Row(elem_classes="code-display-container"):
-                        gr.Markdown("<p class='section-label'>Generated Code</p>")
-                        code_display = gr.Code(
-                            language="python",
-                            label="",
-                            show_label=False,
-                            lines=15,
-                            elem_classes="code-display"
-                        )
-                    
-                    # Input area with better styling
-                    with gr.Row(elem_classes="input-container"):
-                        with gr.Column(scale=5):
-                            user_input = gr.Textbox(
-                                show_label=False,
-                                placeholder="Ask me to write some Python or PowerShell code...",
-                                lines=3,
-                                elem_classes="modern-input",
-                                container=False,
-                                submit_btn=None,
-                                autofocus=True,
-                                max_lines=10
+            with gr.Tabs():
+                with gr.Tab("Chat", elem_classes="tab-content"):
+                    with gr.Column(elem_classes="chat-container"):
+                        # Side-by-side layout for chat and code
+                        with gr.Row(elem_classes="chat-code-container"):
+                            # Left column - Chat
+                            with gr.Column(elem_classes="chat-column"):
+                                gr.Markdown("<p class='section-label'>Conversation</p>")
+                                logo_path = os.path.join(os.path.dirname(__file__), APP_LOGO)
+                                chatbot = gr.Chatbot(
+                                    height=400,
+                                    avatar_images=(None, logo_path),
+                                    show_copy_button=True,
+                                    type='messages',
+                                    elem_classes="modern-chatbot"
+                                )
+                                
+                                # Input area with better styling
+                                with gr.Row():
+                                    with gr.Column(scale=5):
+                                        user_input = gr.Textbox(
+                                            show_label=False,
+                                            placeholder="Ask me to write some Python or PowerShell code...",
+                                            lines=3,
+                                            elem_classes="modern-input",
+                                            container=False,
+                                            submit_btn=None,
+                                            autofocus=True,
+                                            max_lines=10
+                                        )
+                                    
+                                    with gr.Column(scale=1, min_width=100):
+                                        submit_btn = gr.Button("Send", variant="primary", elem_classes="send-button")
+                            
+                            # Right column - Code display
+                            with gr.Column(elem_classes="code-column"):
+                                gr.Markdown("<p class='section-label'>Generated Code</p>")
+                                code_display = gr.Code(
+                                    language="python",
+                                    label="",
+                                    show_label=False,
+                                    lines=15,
+                                    elem_classes="code-display"
+                                )
+                        
+                        # Status message in its own container
+                        with gr.Row(elem_classes="status-container"):
+                            status_text = gr.Textbox(
+                                label="Status", 
+                                interactive=False, 
+                                value="Ready - No models loaded yet",
+                                elem_classes="status-text"
                             )
                         
-                        with gr.Column(scale=1, min_width=100):
-                            submit_btn = gr.Button("Send", variant="primary", elem_classes="send-button")
+                        # Reorganized button layout
+                        with gr.Row(elem_classes="action-buttons-container"):
+                            with gr.Column(elem_classes="action-button-group"):
+                                clear_btn = gr.Button("Clear Conversation", elem_classes="action-button")
+                                unload_btn = gr.Button("Unload Models", elem_classes="action-button")
+                            
+                            with gr.Column(elem_classes="action-button-group"):
+                                learn_btn = gr.Button("Learn from Response", elem_classes="action-button")
+                                settings_btn = gr.Button("Settings", elem_classes="action-button")
                         
-                        # Status message - Now visible by default to show model loading status
-                        status_text = gr.Textbox(
-                            label="Status", 
-                            interactive=False, 
-                            value="Ready - No models loaded yet",
-                            elem_classes="status-text"
-                        )
+                        with gr.Row(elem_classes="feedback-buttons"):
+                            with gr.Column(scale=1):
+                                like_btn = gr.Button("👍 Like", elem_classes="feedback-button")
+                            with gr.Column(scale=1):
+                                dislike_btn = gr.Button("👎 Dislike", elem_classes="feedback-button")
                         
-                        # Settings with accordion styling
-                        with gr.Accordion("Settings", open=False, elem_classes="settings-accordion"):
+                        # Settings accordion - MODIFIED to include language selector
+                        with gr.Accordion("Settings", open=False, elem_classes="settings-accordion", visible=False) as settings_accordion:
+                            # ADDED: Language selector moved here
+                            with gr.Row(elem_classes="language-selector-container"):
+                                with gr.Column(scale=3):
+                                    gr.Markdown("<p class='section-label'>Select Programming Language</p>")
+                                    language_selector = gr.Radio(
+                                        choices=["Auto Detect", "Python", "PowerShell"],
+                                        value="Auto Detect",
+                                        label="Language Mode",
+                                        interactive=True,
+                                        elem_classes="language-options"
+                                    )
+                                with gr.Column(scale=2):
+                                    language_indicator = gr.Markdown(
+                                        "**Current Language**: Auto Detect", 
+                                        elem_classes="language-indicator"
+                                    )
+                            
+                            # Existing settings
                             with gr.Row():
                                 temperature = gr.Slider(
                                     minimum=0.0, maximum=1.0, value=0.2, step=0.1,
@@ -530,20 +714,16 @@ class MultiLanguageCodeBuddy:
                                     label="Max Tokens",
                                     elem_classes="modern-slider"
                                 )
-                            # New option to unload models
-                            with gr.Row():
-                                unload_btn = gr.Button("Unload Models (Free Memory)", elem_classes="action-button")
-                        
-                        # Action buttons with improved styling
-                        with gr.Row(elem_classes="action-buttons"):
-                            clear_btn = gr.Button("Clear Conversation", elem_classes="action-button")
-                            learn_btn = gr.Button("Learn from Current Response", elem_classes="action-button")
-                        
-                        with gr.Row(elem_classes="feedback-buttons"):
-                            like_btn = gr.Button("👍 Like", elem_classes="feedback-button")
-                            dislike_btn = gr.Button("👎 Dislike", elem_classes="feedback-button")
-                
-                # AI Comparison Tab
+                                
+                            # Action buttons (already present)
+                            with gr.Row(elem_classes="action-buttons"):
+                                clear_settings_btn = gr.Button("Clear Conversation", elem_classes="action-button")
+                                learn_settings_btn = gr.Button("Learn from Current Response", elem_classes="action-button")
+                            
+                            with gr.Row(elem_classes="feedback-buttons"):
+                                like_settings_btn = gr.Button("👍 Like", elem_classes="feedback-button")
+                                dislike_settings_btn = gr.Button("👎 Dislike", elem_classes="feedback-button")
+                    
                 with gr.Tab("AI Comparison", elem_classes="tab-content"):
                     gr.Markdown(f"<h2 class='section-title'>{APP_NAME} vs Other AI Systems</h2>")
                     gr.Markdown("<p class='section-description'>Compare responses between CodeBuddy and other AI systems. This helps improve our model training.</p>")
@@ -597,8 +777,7 @@ class MultiLanguageCodeBuddy:
                     # Optional: Add buttons to copy from chat history
                     with gr.Row(elem_classes="comparison-actions"):
                         copy_from_chat_btn = gr.Button("Copy Last Question & Response from Chat", elem_classes="action-button")
-                
-                # Training Data Tab
+                    
                 with gr.Tab("Training Data", elem_classes="tab-content"):
                     gr.Markdown(f"<h2 class='section-title'>{APP_NAME} Training Data Management</h2>")
                     gr.Markdown("<p class='section-description'>Organize and export your training examples for both Python and PowerShell.</p>")
@@ -656,8 +835,7 @@ class MultiLanguageCodeBuddy:
                             with gr.Tab("Comparison Notes"):
                                 example_notes = gr.Textbox(label="Notes", lines=5, interactive=True, elem_classes="note-field")
                                 save_notes_btn = gr.Button("Save Notes", elem_classes="action-button")
-                
-                # About Tab
+                    
                 with gr.Tab("About", elem_classes="tab-content"):
                     # About content remains the same as in the previous version
                     gr.Markdown(f"<h1 class='about-title'>{APP_NAME}</h1>")
@@ -670,37 +848,84 @@ class MultiLanguageCodeBuddy:
                     </div>
                     """)
             
-            # Connect event handlers
+            # Define all functions first before connecting any buttons
+            
+            # Function to toggle settings visibility
+            def toggle_settings():
+                return gr.update(visible=not settings_accordion.visible)
+            
+            # Enhanced model unloading function
+            def unload_models_enhanced():
+                # Unload all currently loaded models
+                models_unloaded = []
+                for language in ['python', 'powershell']:
+                    if self.model_manager.is_model_loaded(language):
+                        self.model_manager.unload_model(language)
+                        models_unloaded.append(language.capitalize())
+                
+                # Force additional cleanup
+                if torch.cuda.is_available():
+                    torch.cuda.empty_cache()
+                    
+                if models_unloaded:
+                    return f"Unloaded models: {', '.join(models_unloaded)}. GPU memory freed."
+                else:
+                    return "No models were loaded to unload."
+            
+            # Language detection functions
             def detect_and_update_language(message):
                 if not message:
-                    return "Auto Detect", "**Current Language Mode**: Auto Detect"
+                    return "Auto Detect", "**Current Language**: Auto Detect"
                 
                 # Use the model manager's language detection
                 detected_language = self.model_manager.detect_language(message)
                 language_name = detected_language.capitalize()
                 
-                return "Auto Detect", f"**Current Language Mode**: {language_name}"
+                return "Auto Detect", f"**Current Language**: {language_name}"
 
             def set_language(choice):
                 if choice == "Auto Detect":
-                    return "**Current Language Mode**: Auto Detect"
+                    return "**Current Language**: Auto Detect"
                 
-                return f"**Current Language Mode**: {choice}"
-
-            # Connect language detection to input
-            user_input.change(
-                fn=detect_and_update_language,
-                inputs=[user_input],
-                outputs=[language_selector, language_indicator]
-            )
+                return f"**Current Language**: {choice}"
             
-            # Connect language selector to indicator
-            language_selector.change(
-                fn=set_language,
-                inputs=[language_selector],
-                outputs=[language_indicator]
-            )
+            # Clear conversation handler
+            def clear_all():
+                return [], gr.update(value="Conversation cleared", visible=True), gr.update(value="", language="python")
             
+            # Save current response function
+            def save_current_response(chat_history):
+                if len(chat_history) == 0:
+                    return gr.update(value="No conversation to learn from.", visible=True)
+                
+                # Get the last user message and bot response
+                last_user_msg = next((msg for msg in reversed(chat_history) if msg.get('role') == 'user'), None)
+                last_bot_msg = next((msg for msg in reversed(chat_history) if msg.get('role') == 'assistant'), None)
+                
+                if not last_user_msg or not last_bot_msg:
+                    return gr.update(value="Incomplete conversation to learn from.", visible=True)
+                result = self.save_training_example(last_user_msg['content'], last_bot_msg['content'], APP_NAME)
+                return gr.update(value=result, visible=True)
+            
+            # Function to copy from chat history to comparison tab
+            def copy_from_chat(chat_history):
+                if not chat_history or len(chat_history) < 2:
+                    return "", "", gr.update(value="No complete conversation found in chat history.", visible=True)
+                
+                # Get the last user message and bot response
+                last_user_msg = next((msg for msg in reversed(chat_history) if msg.get('role') == 'user'), None)
+                last_bot_msg = next((msg for msg in reversed(chat_history) if msg.get('role') == 'assistant'), None)
+                
+                if not last_user_msg or not last_bot_msg:
+                    return "", "", gr.update(value="Incomplete conversation in chat history.", visible=True)
+                
+                # Return the contents to populate the comparison fields
+                return (
+                    last_user_msg['content'],  # question
+                    last_bot_msg['content'],   # codebuddy response
+                    gr.update(value="Copied from chat history!", visible=True)
+                )
+            # Modified respond function to handle the new layout
             def respond(message, chat_history, lang_choice, temp, max_len):
                 if not message.strip():
                     return "", chat_history, gr.update(value="Empty message", visible=True), gr.update(value="", language="python")
@@ -723,7 +948,23 @@ class MultiLanguageCodeBuddy:
                 
                 # Process language selection
                 selected_language = None if lang_choice == "Auto Detect" else lang_choice.lower()
-                detected_language = selected_language if selected_language else "python"  # Default language for code display
+                
+                # Set a default display language for code highlighting that's compatible with Gradio
+                if selected_language == "powershell":
+                    display_language = "bash"  # Use bash highlighting for PowerShell as it's close enough
+                else:
+                    display_language = selected_language if selected_language else "python"
+                
+                # Before generating, ensure we unload any other models to free memory
+                if selected_language and selected_language != "auto detect":
+                    # Unload other language models if they're loaded
+                    other_language = "powershell" if selected_language == "python" else "python"
+                    if self.model_manager.is_model_loaded(other_language):
+                        self.model_manager.unload_model(other_language)
+                        yield "", chat_history, gr.update(
+                            value=f"Unloaded {other_language.capitalize()} model to free memory",
+                            visible=True
+                        ), gr.update(value="", language=display_language)
                 
                 # Use generator to stream responses
                 bot_response = ""
@@ -737,7 +978,7 @@ class MultiLanguageCodeBuddy:
                 ):
                     # If the response is a status message, update status
                     if response == self.status_message:
-                        yield "", chat_history, gr.update(value=response, visible=True), gr.update(value="", language=detected_language)
+                        yield "", chat_history, gr.update(value=response, visible=True), gr.update(value="", language=display_language)
                         continue
                     
                     # Otherwise, it's generated code - extract actual code from markdown
@@ -750,26 +991,141 @@ class MultiLanguageCodeBuddy:
                         # Update detected language from the code block if present
                         lang_match = re.search(r'```(\w+)', response)
                         if lang_match:
-                            detected_language = lang_match.group(1).lower()
+                            detected_lang = lang_match.group(1).lower()
+                            # Map PowerShell to bash for display purposes
+                            if detected_lang == "powershell":
+                                display_language = "bash"
+                            else:
+                                display_language = detected_lang
                 
-                # Create a cleaner chat response without the code block
-                chat_response = "I've generated the requested code. You can see it in the code panel below."
+                # MODIFIED: Extract explanation text before and after the code block
+                explanation_before = ""
+                explanation_after = ""
                 
-                # Add bot response to chat history, but with the cleaner message
+                # Get text before the code block
+                before_match = re.match(r'^(.*?)```', bot_response, re.DOTALL)
+                if before_match:
+                    explanation_before = before_match.group(1).strip()
+                
+                # Get text after the code block
+                after_match = re.search(r'```[\w]*\n[\s\S]*?\n```\s*([\s\S]*)', bot_response)
+                if after_match:
+                    explanation_after = after_match.group(1).strip()
+                
+                # Create a simplified chat response without the code block
+                if explanation_before or explanation_after:
+                    chat_response = ""
+                    if explanation_before:
+                        chat_response += explanation_before
+                    
+                    # Add a note about the code being in the code panel
+                    chat_response += "\n\n*The generated code is available in the code panel.*" if explanation_before else "*The generated code is available in the code panel.*"
+                    
+                    if explanation_after:
+                        chat_response += "\n\n" + explanation_after
+                else:
+                    # If no explanations were found, provide a simple message
+                    chat_response = "I've generated the requested code. Please see the code panel for the implementation."
+                
+                # Add the simplified response to chat history
                 chat_history.append({
                     "role": "assistant", 
-                    "content": chat_response
+                    "content": chat_response  # Only explanation text, no code
                 })
                 
                 # Get the language that was actually used if not detected earlier
-                if not detected_language:
-                    detected_language = self.detect_language(message)
+                if not selected_language:
+                    selected_language = self.model_manager.detect_language(message)
+                
+                # Ensure we're using a supported language for the Gradio code component
+                if selected_language == "powershell":
+                    display_message = f"Code generation complete using PowerShell model (displayed with bash syntax highlighting)"
+                else:
+                    display_message = f"Code generation complete using {selected_language.capitalize()} model"
                 
                 yield "", chat_history, gr.update(
-                    value=f"Code generation complete using {detected_language.capitalize()} model", 
+                    value=display_message, 
                     visible=True
-                ), gr.update(value=code_content, language=detected_language)
-
+                ), gr.update(value=code_content, language=display_language)
+            
+            # Settings button connection
+            settings_btn.click(
+                fn=toggle_settings,
+                inputs=[],
+                outputs=[settings_accordion]
+            )
+            
+            # Unload models button
+            unload_btn.click(
+                fn=unload_models_enhanced,
+                inputs=None,
+                outputs=status_text
+            )
+            
+            # Language detection and selection
+            user_input.change(
+                fn=detect_and_update_language,
+                inputs=[user_input],
+                outputs=[language_selector, language_indicator]
+            )
+            
+            language_selector.change(
+                fn=set_language,
+                inputs=[language_selector],
+                outputs=[language_indicator]
+            )
+            
+            # Connect the clear buttons
+            clear_btn.click(
+                fn=clear_all,
+                inputs=None,
+                outputs=[chatbot, status_text, code_display]
+            )
+            
+            clear_settings_btn.click(
+                fn=clear_all,
+                inputs=None,
+                outputs=[chatbot, status_text, code_display]
+            )
+            
+            # Connect the learn buttons
+            learn_btn.click(
+                fn=save_current_response,
+                inputs=[chatbot],
+                outputs=[status_text]
+            )
+            
+            learn_settings_btn.click(
+                fn=save_current_response,
+                inputs=[chatbot],
+                outputs=[status_text]
+            )
+            
+            # Connect the feedback buttons
+            like_btn.click(
+                fn=lambda chat_history: self.save_positive_feedback(chat_history), 
+                inputs=[chatbot], 
+                outputs=[status_text]
+            )
+            
+            dislike_btn.click(
+                fn=lambda chat_history: self.save_negative_feedback(chat_history), 
+                inputs=[chatbot], 
+                outputs=[status_text]
+            )
+            
+            like_settings_btn.click(
+                fn=lambda chat_history: self.save_positive_feedback(chat_history), 
+                inputs=[chatbot], 
+                outputs=[status_text]
+            )
+            
+            dislike_settings_btn.click(
+                fn=lambda chat_history: self.save_negative_feedback(chat_history), 
+                inputs=[chatbot], 
+                outputs=[status_text]
+            )
+            
             # Stream responses to show generation progress
             submit_btn.click(
                 fn=respond,
@@ -784,76 +1140,6 @@ class MultiLanguageCodeBuddy:
                 outputs=[user_input, chatbot, status_text, code_display],
                 queue=True
             )
-
-            # Update unload models handler
-            unload_btn.click(
-                fn=self.unload_current_model,
-                inputs=None,
-                outputs=status_text
-            )
-
-            # Modify clear conversation handler
-            def clear_all():
-                return [], gr.update(value="Conversation cleared", visible=True), gr.update(value="", language="python")
-
-            # Update the clear conversation handler
-            clear_btn.click(
-                fn=clear_all,
-                inputs=None,
-                outputs=[chatbot, status_text, code_display]
-            )
-            
-            def save_current_response(chat_history):
-                if len(chat_history) == 0:
-                    return gr.update(value="No conversation to learn from.", visible=True)
-                
-                # Get the last user message and bot response
-                last_user_msg = next((msg for msg in reversed(chat_history) if msg.get('role') == 'user'), None)
-                last_bot_msg = next((msg for msg in reversed(chat_history) if msg.get('role') == 'assistant'), None)
-                
-                if not last_user_msg or not last_bot_msg:
-                    return gr.update(value="Incomplete conversation to learn from.", visible=True)
-                result = self.save_training_example(last_user_msg['content'], last_bot_msg['content'], APP_NAME)
-                return gr.update(value=result, visible=True)
-            
-            # Connect learn button
-            learn_btn.click(
-                fn=save_current_response,
-                inputs=[chatbot],
-                outputs=[status_text]
-            )
-            
-            # Connect feedback buttons with lambda to correctly pass self
-            like_btn.click(
-                fn=lambda chat_history: self.save_positive_feedback(chat_history), 
-                inputs=[chatbot], 
-                outputs=[status_text]
-            )
-            
-            dislike_btn.click(
-                fn=lambda chat_history: self.save_negative_feedback(chat_history), 
-                inputs=[chatbot], 
-                outputs=[status_text]
-            )
-            
-            # Function to copy from chat history to comparison tab
-            def copy_from_chat(chat_history):
-                if not chat_history or len(chat_history) < 2:
-                    return "", "", gr.update(value="No complete conversation found in chat history.", visible=True)
-                
-                # Get the last user message and bot response
-                last_user_msg = next((msg for msg in reversed(chat_history) if msg.get('role') == 'user'), None)
-                last_bot_msg = next((msg for msg in reversed(chat_history) if msg.get('role') == 'assistant'), None)
-                
-                if not last_user_msg or not last_bot_msg:
-                    return "", "", gr.update(value="Incomplete conversation in chat history.", visible=True)
-                
-                # Return the contents to populate the comparison fields
-                return (
-                    last_user_msg['content'],  # question
-                    last_bot_msg['content'],   # codebuddy response
-                    gr.update(value="Copied from chat history!", visible=True)
-                )
             
             # Connect the AI comparison tab buttons
             save_comparison_btn.click(
@@ -917,7 +1203,7 @@ class MultiLanguageCodeBuddy:
             training_examples_list.value = self.refresh_training_examples()
         
         return interface
-
+   
 # Main entry point
 if __name__ == "__main__":
     print(f"\nStarting {APP_NAME}...")

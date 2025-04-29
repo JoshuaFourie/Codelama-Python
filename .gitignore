@@ -1,21 +1,3 @@
-/ignore
 /models
-/old_code
+/ignore
 /__pycache__
-/backend/__pycache__
-/frontend/.next
-/frontend/node_modules/.bin
-/frontend/node_modules/@babel
-/frontend/node_modules/@csstools
-/frontend/node_modules/@eslint-community
-/frontend/node_modules/@eslint
-/frontend/node_modules/@humanwhocodes
-/frontend/node_modules/@isaacs
-/frontend/node_modules/@jridgewell
-/frontend/node_modules/@next
-/frontend/node_modules/@nodelib
-/frontend/node_modules/webpack
-/frontend/node_modules/yaml
-/frontend/node_modules
-/Original Code/__pycache__
-dump_snapshot.pickle
